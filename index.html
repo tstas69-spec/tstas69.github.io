@@ -1,10 +1,471 @@
-<html>
-<head><title>Сайт</title></head>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>3 шага по созданию своего mtproto для телеграмм</title>
+    <meta name="description" content="Как подключить прокси mtproto для телеграмм пошаговая инструкция. Установка MTProto прокси на VPS за 3 шага.">
+    <style>
+        /* Стили из образца-без меню.html */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        header, footer {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eee;
+            border-bottom: none;
+            padding-top: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+            line-height: 1.3;
+        }
+        .lead {
+            font-size: 1.15em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 2px solid #eee;
+            font-size: 1.4em;
+        }
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            font-size: 1.2em;
+        }
+        .step-label {
+            font-weight: bold;
+            color: #e74c3c;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        a {
+            color: #2980b9;
+            text-decoration: none;
+            word-break: break-word;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .toc {
+            background: #f1f8ff;
+            border-left: 4px solid #3498db;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .toc ol {
+            padding-left: 20px;
+        }
+        .card, .block {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .card strong, .block strong {
+            color: #2c3e50;
+        }
+        .warning {
+            color: #c0392b;
+            font-weight: bold;
+        }
+        .pic {
+            text-align: center;
+            margin: 25px 0;
+        }
+        .pic img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .pic-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        ul, ol {
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .comment-form {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .comment-form h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .comment-form input,
+        .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 1em;
+        }
+        .comment-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+            max-width: 200px;
+        }
+        .comment-form button:hover {
+            background-color: #2980b9;
+        }
+        .comment-form p:last-child {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 15px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9em;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        /* Mobile optimization */
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            h3 {
+                font-size: 1.1em;
+            }
+            .pic {
+                margin: 15px 0;
+            }
+            .card, .block {
+                padding: 12px 15px;
+            }
+            .comment-form {
+                padding: 15px;
+            }
+            .comment-form button {
+                max-width: 100%;
+            }
+            ul, ol {
+                padding-left: 18px;
+            }
+            .toc {
+                padding: 12px 15px;
+            }
+        }
+        @media (max-width: 400px) {
+            body {
+                padding: 8px;
+            }
+            h1 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
 <body>
-<h1>Работает!</h1>
-  <div class="pic">
-                <img src="images/mtproto/dannie-dly-telegi-11.png" alt="Скриншот: Личный кабинет Proxys.io, кнопка 'Серверные прокси'">
-                <p class="pic-description">Личный кабинет Proxys.io. Нажмите на кнопку "Серверные прокси".</p>
+
+    <main>
+        <article>
+
+            <h1>Как подключить прокси mtproto для телеграмм пошаговая инструкция</h1>
+            
+            <p class="lead">MTProto для телеграмм наиболее популярный прокси для бесперебойной работы мессенджера. Данный прокси является официальным протоколом Telegram.</p>
+            <p>В этой 3-ех шаговой инструкции вы узнаете, как быстро установить прокси mtproto для телеграмма на арендованном сервере и подключить его к вашему мессенджеру.</p>
+
+            <h2>Требования по установки прокси mtproto для телеграмма</h2>
+            <p><strong>Минимальные требования</strong></p>
+            <ul>
+                <li><strong>Операционная система:</strong> Ubuntu 20.04 / 22.04 (чистая установка)</li>
+                <li><strong>Сервер (VPS):</strong> 1 ядро, 512 MB RAM — этого достаточно</li>
+                <li><strong>Доступ по SSH</strong> (корень или пользователь с sudo)</li>
+                <li><strong>Открытый порт 443</strong> (нужен для маскировки под HTTPS)</li>
+            </ul>
+            <p>Вся инструкция будет построена на примере провайдера Aeza. Вы можете использовать любого другого провайдера, предоставляющего аренду VPS серверов в Европе.</p>
+            <p>И так, погнали:</p>
+
+            <h2>Шаг 1 — Арендуем забугорный сервер и подключаемся</h2>
+            <p>Регистрируемся в Aeza.net (ссылка на партнерку <a href="https://aeza.net/?ref=455016" target="_blank">https://aeza.net/?ref=455016</a>) и переходим в меню слева, добавить услугу (см. скрин, подчеркнуто красным). По центру выбираем локацию, ищем Европу с ценой в 5,93 евро, на скрине в качестве примера выбрана Вена.</p>
+            <p>Справа проверяем, чтобы были отключены бэкапы, они не нужны, выделено прямоугольником на скрине. Автопродление по желанию.</p>
+            <p>Прокручиваем чуть ниже и переключаем на Ubuntu 20.04 / 22.04, по умолчанию стоит 26.04, она еще сырая, переключить обязательно!</p>
+            <p>Больше ничего устанавливать не требуется, нужна чистая операционка.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/mtproto-dly-telegramm-1.png" alt="Скриншот: аренда сервера в Aeza" loading="lazy">
+                <p class="pic-description">Аренда сервера в панели Aeza</p>
             </div>
+
+            <p>Далее нажимаем оплатить. Оплата от рублевых карт, до криптовалют.</p>
+            <p>Открывают после оплаты от 2 до 15 минут, о чем извещают по почте. Далее переходим в левом меню на вкладку мои услуги:</p>
+
+            <div class="pic">
+                <img src="images/mtproto/moi-uslugi-1.1.png" alt="Скриншот: вкладка мои услуги в Aeza" loading="lazy">
+                <p class="pic-description">Вкладка "Мои услуги" в панели Aeza</p>
+            </div>
+
+            <p>И нажимаем на название сервера, подчеркнуто красным. Откроется окно с данными для входа, см. скрин.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/dannie-servera-1.2.png" alt="Скриншот: данные сервера для входа" loading="lazy">
+                <p class="pic-description">Данные сервера: IP, логин, пароль</p>
+            </div>
+
+            <p>Данные будут в таком формате:</p>
+            <ul>
+                <li><strong>ip:</strong> 86.163.135.43 (IP вашего сервера будет другой);</li>
+                <li><strong>логин:</strong> root (чаще всего логин такой);</li>
+                <li><strong>пароль:</strong> E7D4sF3csSjg (пароль от вашего сервера будет другой);</li>
+            </ul>
+            <p>Для настройки сервера понадобится доступ к самому серверу с данными (логином, паролем и ip адресом, поэтому их важно сохранить). Делается это все с компьютера (с телефона не тестил, может и можно, пишите в комментах), под Windows или MacOS.</p>
+            <p>Под Win потребуется специальная программка, обладатели MacOS воспользуются встроенным терминалом.</p>
+            <p>Итак, погнали:</p>
+            <p><strong>Windows</strong> — скачиваем и ставим программу для подключения к нашему серверу: переходим на <a href="https://www.putty.org/" target="_blank">https://www.putty.org/</a> скачиваем и устанавливаем. После установки появится ярлык на рабочем столе, запустите его, как показано на скрине.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/ustanovka-i-zapusk-putty-4.jpg" alt="Скриншот: установка и запуск Putty" loading="lazy">
+                <p class="pic-description">Установка и запуск Putty на Windows</p>
+            </div>
+
+            <p>Подключаемся к нашему серверу, вводим IP сервера, порт 22 и нажимаем Open, как показано на рисунке ниже.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/podkluchenie-ip-2.jpg" alt="Скриншот: подключение к серверу в Putty" loading="lazy">
+                <p class="pic-description">Подключение к серверу через Putty</p>
+            </div>
+
+            <p>Далее, идем во вкладку Подключение (Connection) и в первой строке в поле для ввода прописываем любое число от 20 до 50, например 50, как показано на рисунке.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/nastroika-connection-3.png" alt="Скриншот: настройка Connection в Putty" loading="lazy">
+                <p class="pic-description">Настройка параметров Connection в Putty</p>
+            </div>
+
+            <p>Нажимаем Open</p>
+            <p>Когда заходим на сервер в первый раз, то нужно нажать Accept в окне, которое появится. Далее, в следующем окне поочередно вводим логин и пароль, каждый раз нажимая Enter.</p>
+            <p><strong>ВНИМАНИЕ!</strong> при вводе пароля на экране символы не отображаются, это нормально. Чтобы вставить скопированный пароль — просто нажмите один раз на ПКМ (правую кнопку мыши) в окне авторизации на черном фоне и затем Enter, см. скрин.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/vvod-logo-pass-5.jpg" alt="Скриншот: ввод логина и пароля в Putty" loading="lazy">
+                <p class="pic-description">Ввод логина и пароля в Putty</p>
+            </div>
+
+            <p>В случае успешного подключения пройдет загрузка данных о системе и будет приглашение на выдачу команд Вашему серверу. В примере ниже- это приглашение на самой последней строке и выглядит — root@TESTVDS:~# Эта строка означает, что сервер готов принимать в обработку и выполнение Ваши команды.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/uspeschnoe-podcluchenie-6.jpg" alt="Скриншот: успешное подключение к серверу" loading="lazy">
+                <p class="pic-description">Успешное подключение к серверу</p>
+            </div>
+
+            <p>Все, супер, подключение состоялось, переходите чуть ниже, дальше инструкция для MacOS. Хотя рекомендую оценить инструкцию и понять прелесть использования Макентошей.</p>
+            <p><strong>MacOS</strong> — если у вас мак, тогда мы будем использовать встроенный терминал, так как нет смысла устанавливать сторонние программы для того, чтобы один раз на пару минут зайти на сервер.</p>
+            <p>Итак, вводим в лаунчпаде в поиске слово Терминал или Terminal, видим это</p>
+
+            <div class="pic">
+                <img src="images/mtproto/terminal-macos-7.jpg" alt="Скриншот: поиск терминала на MacOS" loading="lazy">
+                <p class="pic-description">Поиск терминала на MacOS</p>
+            </div>
+
+            <p>Открываем терминал, прописываем команду и нажимаем Enter</p>
+            <pre>ssh ваш_логин@IP-адрес_сервера</pre>
+            <p>то есть, если мой логин root а айпи сервера 79.137.202.97, то команда в терминал будет</p>
+            <pre>ssh root@79.137.202.97</pre>
+            <p>далее, вставляем пароль, нажимаем Enter готово.</p>
+            <p>При удачном подключении должно получится, как на скрине — root@название сервера.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/podkluch-k-serveru-8.png" alt="Скриншот: подключение к серверу через терминал MacOS" loading="lazy">
+                <p class="pic-description">Подключение к серверу через терминал MacOS</p>
+            </div>
+
+            <h2>Шаг 2 — Настраиваем прокси сервер mtproto для телеграмма</h2>
+            <p>Далее необходимо ввести всего одну команду и нажать энтер:</p>
+            <pre>sudo apt update && sudo apt upgrade -y && sudo apt install docker.io ufw -y && sudo ufw allow OpenSSH && sudo ufw allow 443/tcp && sudo ufw --force enable && SECRET=$(docker run --rm nineseconds/mtg:2 generate-secret --hex google.com) && docker run -d --name mtg --restart=always -p 443:443 nineseconds/mtg:2 simple-run -n 1.1.1.1 -i prefer-ipv4 0.0.0.0:443 "$SECRET" && echo "✅ ГОТОВАЯ ССЫЛКА: tg://proxy?server=$(curl -s ifconfig.me)&port=443&secret=$SECRET"</pre>
+            <p>Команда вводится целиком, без пробелов, как есть. В ходе установки будет задан вопрос, ответить надо — yes. Далее вылетит 3 или 4 окна, как показано на скрине ниже, ввести надо Enter, четыре раза.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/zapros-na-enter-9.png" alt="Скриншот: запрос подтверждения установки" loading="lazy">
+                <p class="pic-description">Запрос подтверждения установки</p>
+            </div>
+
+            <p>Результатом установки будет готовый Европейский сервер с прокси mtproto для телеграмма. Смотри скрин ниже.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/mtproto-gotov-10.png" alt="Скриншот: готовый MTProto прокси" loading="lazy">
+                <p class="pic-description">Готовый MTProto прокси на сервере</p>
+            </div>
+
+            <p>Все, на этом установка завершена.</p>
+            <p><strong>Что делает и устанавливает на Ваш сервер данная команда:</strong></p>
+            <ul>
+                <li>Обновляет список пакетов</li>
+                <li>Устанавливает все обновления системы</li>
+                <li>Ставит утилиту curl</li>
+                <li>Автоматически устанавливается Docker</li>
+                <li>Настраивается MTProto прокси на порту 443</li>
+                <li>Включается технология Fake TLS — маскировка под обычный HTTPS</li>
+                <li>Генерируется секретный ключ</li>
+            </ul>
+            <p>Всё это занимает 1–2 минуты. Просто ждите.</p>
+            <p>Далее скопируйте полностью ссылку для телеграмма — <code>tg://proxy?server=194.33.35.192&port=443&secret=ee3a44c56ab55a1a368eb3b260a2550432676f6f676c652e636f6d</code></p>
+            <p>И приведите ее к такому виду, как показано на скриншоте</p>
+
+            <div class="pic">
+                <img src="images/mtproto/dannie-dly-telegi-11.png" alt="Скриншот: данные для подключения в Telegram" loading="lazy">
+                <p class="pic-description">Данные для подключения прокси в Telegram</p>
+            </div>
+
+            <p><strong>Будьте внимательны!</strong> Сервер = цифры, порт = цифры, секрет = абракодабра целиком!</p>
+            <p>Отправьте эти данные себе на телефон или отсканируйте кюард код. Вы можете смело подключить 50 — 70 устройств и даже заработать на этом.</p>
+
+            <h2>Шаг 3 — Подключение mtproto прокси для телеграмм</h2>
+            <p>Перейдите в меню настроек и найдите — Данные и память, как показано на скрине и нажмите на этот пункт.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/telegramm-12.jpg" alt="Скриншот: меню Данные и память в Telegram" loading="lazy">
+                <p class="pic-description">Меню "Данные и память" в Telegram</p>
+            </div>
+
+            <p>Далее в следующем окне прокрутите вниз и найдите пункт — Настройка прокси, см. скрин.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/telegramm-proksi-13.jpg" alt="Скриншот: пункт Настройка прокси в Telegram" loading="lazy">
+                <p class="pic-description">Пункт "Настройка прокси" в Telegram</p>
+            </div>
+
+            <p>Нажмите на него и попадете в окно настройки вашего прокси</p>
+
+            <div class="pic">
+                <img src="images/mtproto/vstavka-proksi-14.png" alt="Скриншот: окно настройки прокси в Telegram" loading="lazy">
+                <p class="pic-description">Окно настройки прокси в Telegram</p>
+            </div>
+
+            <p>Вставьте подготовленные данные, как показано на скрине выше. Адрес сервера, порт и секретный ключ. Вы должны увидеть следующее:</p>
+
+            <div class="pic">
+                <img src="images/mtproto/podklych-proksi-15.png" alt="Скриншот: подключение прокси в Telegram" loading="lazy">
+                <p class="pic-description">Подключение прокси в Telegram</p>
+            </div>
+
+            <p>Запустите свой телеграмм на телефоне или ПК. Должно сработать подключение, и Телега заработает. Возможно, при первом подключении пройдет пара минут, пока чаты обновляются.</p>
+
+            <div class="pic">
+                <img src="images/mtproto/rabochi-telegramm-16.png" alt="Скриншот: работающий Telegram через прокси" loading="lazy">
+                <p class="pic-description">Работающий Telegram через MTProto прокси</p>
+            </div>
+
+            <h3>Заключение</h3>
+            <p>Вы успешно прошли все 3 шага:</p>
+            <ol>
+                <li>✅ Арендовали VPS в Aeza</li>
+                <li>✅ Установили MTProto прокси одной командой</li>
+                <li>✅ Получили ссылку и подключили Telegram</li>
+            </ol>
+            <p>Теперь у вас <strong>собственный приватный MTProto прокси для Telegram</strong> — стабильный, быстрый и безопасный.</p>
+
+            <h3>FAQ — частые вопросы</h3>
+            <p><strong>1. Можно ли установить MTProto на Windows?</strong><br>Да, но инструкция сложнее. Для простоты и стабильности лучше использовать Ubuntu на VPS.</p>
+            <p><strong>2. Сколько трафика потребляет прокси?</strong><br>Почти весь трафик зависит от вас — сколько вы сидите в Telegram. Обычно не более 2-3 ГБ в месяц.</p>
+            <p><strong>3. Как удалить прокси?</strong><br>На сервере выполните:</p>
+            <pre>docker stop mtproto-proxy && docker rm mtproto-proxy</pre>
+            <p><strong>4. Нужно ли продлевать сервер каждый месяц?</strong><br>Да, это аренда. Если не продлить — прокси отключится. Telegram просто перестанет подключаться, и вы вернётесь к обычному интернету без прокси.</p>
+            <p>Надеюсь, мне удалось рассказать, как подключить mtproto для телеграмм.</p>
+
+            <!-- Форма комментариев -->
+            <div class="comment-form">
+                <h3>Оставить комментарий</h3>
+                <p>Задавайте вопросы, делитесь опытом или предложениями</p>
+                <form action="#" method="post">
+                    <input type="text" name="name" placeholder="Ваше имя" required>
+                    <input type="email" name="email" placeholder="Ваш email (не публикуется)" required>
+                    <textarea name="comment" rows="5" placeholder="Ваш комментарий..." required></textarea>
+                    <button type="submit">Отправить комментарий</button>
+                </form>
+                <p>Все комментарии проходят модерацию перед публикацией.</p>
+            </div>
+
+        </article>
+    </main>
+
+    <footer>
+        <p>© 2023-2026 Мой Блог. Все материалы защищены.</p>
+    </footer>
+
+    <!-- Яндекс Метрика -->
+    <script>
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            k=e.createElement(t), a=e.getElementsByTagName(t)[0], k.async=1, k.src=r, a.parentNode.insertBefore(k,a)
+        })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+        ym(XXXXXXXX, "init", { // Замените XXXXXXXX на ваш номер счетчика
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true
+        });
+    </script>
+    <noscript>
+        <div><img src="https://mc.yandex.ru/watch/XXXXXXXX" style="position:absolute; left:-9999px;" alt="" /></div>
+    </noscript>
+
 </body>
 </html>
